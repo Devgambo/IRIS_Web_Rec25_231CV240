@@ -1,0 +1,37 @@
+import mongoose from "mongoose";
+import Equipment from "./equipment.model";
+import User from "./user.model";
+
+const equipmentRequestSchema = new mongoose.Schema({
+   userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User,
+      required: true
+   },
+   equipmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: Equipment,
+      required: true
+   },
+   quantity: {
+      type: Number, required: true
+   },
+   duration: {
+      type: Number, required: true
+   },
+   status: {
+      type: String, enum: ['pending', 'approved', 'rejected', 'cancelled','completed'], default: 'pending'
+   },
+   adminComment: {
+      type: String
+   },
+   requestDate: {
+      type: Date, default: Date.now
+   },
+   approvedDate: {
+      type: Date
+   },
+}, { timestamps: true });
+
+
+export default mongoose.model("EquipmentRequest", equipmentRequestSchema)
