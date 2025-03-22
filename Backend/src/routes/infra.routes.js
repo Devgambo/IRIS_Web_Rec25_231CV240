@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { requireAuth } from '../middlewares/requireAuth';
+import { requireAuth } from '../middlewares/requireAuth.middleware.js';
+import { addNewInfra, deleteInfra, getAllInfra, getAllInfraFromACat, updateInfra } from '../controllers/infraControllers.js';
 
 const router = Router();
 

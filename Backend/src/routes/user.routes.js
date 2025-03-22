@@ -1,6 +1,6 @@
 import { createUser, getAllUsers } from '../controllers/userControllers.js'
-import { requireAuth } from '../middlewares/requireAuth.js';
-import { requireRole } from '../middlewares/requireRole.js'
+import { requireAuth } from '../middlewares/requireAuth.middleware.js';
+import { requireRole } from '../middlewares/requireRole.middleware.js'
 import { Router } from 'express';
 
 const router = Router();

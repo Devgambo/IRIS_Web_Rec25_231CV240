@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import Equipment from "./equipment.model";
-import User from "./user.model";
+import Equipment from "./equipment.model.js";
+import User from "./user.model.js";
 
 const equipmentRequestSchema = new mongoose.Schema({
    userId: {
@@ -20,7 +20,8 @@ const equipmentRequestSchema = new mongoose.Schema({
       type: Number, required: true
    },
    status: {
-      type: String, enum: ['pending', 'approved', 'rejected', 'cancelled','completed'], default: 'pending'
+      type: String, enum: ['pending', 'approved', 'rejected', 'cancelled','completed'],
+      default: 'pending'
    },
    adminComment: {
       type: String

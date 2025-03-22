@@ -1,7 +1,7 @@
 import { useState, useEffect} from 'react';
 import { useSignUp, useAuth, useUser } from '@clerk/clerk-react';
 import { useNavigate } from "react-router-dom";
-import { useSignupMutation } from '@/features/authSliceApi';
+import { useSignupMutation } from '@/features/userSliceApi.js';
 
 export default function VerifyEmail() {
 
@@ -50,8 +50,8 @@ export default function VerifyEmail() {
     } catch (err) {
       console.error("❌ Error saving user:",err);
       setError(
-        err.data?.message || // Handle API error messages
-        err.error || // Handle network errors
+        err.data?.message ||
+        err.error ||
         'Failed to save user data'
       );
     }

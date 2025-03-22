@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Category from "./category.model.js"
 
 const infrastructureSchema = new mongoose.Schema({
   name: {

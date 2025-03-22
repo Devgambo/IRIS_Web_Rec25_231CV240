@@ -1,5 +1,5 @@
-import mongoose, { mongo } from "mongoose";
-import Category from "./category.model";
+import mongoose from "mongoose";
+import Category from "./category.model.js";
 
 const equipmentSchema = new mongoose.Schema({
   name: {

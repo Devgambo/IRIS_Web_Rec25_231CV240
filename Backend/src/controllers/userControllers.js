@@ -26,7 +26,7 @@ export const createUser = asyncHandler(async (req, res) => {
     });
 
     if (!newUser) {
-        throw new ApiError(500, "Something went wrong while fetching the user")
+        throw new ApiError(500, "Something went wrong while saving the user")
     }
 
     return res.json(

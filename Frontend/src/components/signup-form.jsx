@@ -8,7 +8,8 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSignUp, useUser } from '@clerk/clerk-react';
 import VerifyEmail from "./verifyEmail";
-
+import { Eye, EyeOff } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 const signupSchema = z.object({
@@ -19,14 +20,12 @@ const signupSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
-
-
 export default function SignupForm() {
 
   const { signUp } = useSignUp();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
 
   const [isPendingVerification, setIsPendingVerification] = useState(false);
 
@@ -73,13 +72,13 @@ export default function SignupForm() {
 
   if (isPendingVerification) {
     return (
-      <VerifyEmail/>
+      <VerifyEmail />
     )
   }
 
   return (
     (<div
-      className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
+      className="shadow-input w-full mx-auto max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
       <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
         Welcome to SportsMate
       </h2>
@@ -107,7 +106,20 @@ export default function SignupForm() {
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Create Password</Label>
-          <Input {...register('password')} id="password" placeholder="••••••••" type="password" />
+          <div className="relative">
+            <Input {...register('password')} id="password" placeholder="••••••••" type={showPassword ? "text" : "password"} />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+            >
+              {showPassword ? (
+                <Eye className="h-4 w-4 text-gray-500" />
+              ) : (
+                <EyeOff className="h-4 w-4 text-gray-500" />
+              )}
+            </button>
+          </div>
         </LabelInputContainer>
         <button
           disabled={loading}
@@ -117,6 +129,12 @@ export default function SignupForm() {
         </button>
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </form>
+      <p className="text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <Link className="font-medium text-primary hover:underline" to={'/signin'}>
+          Sign in
+        </Link>
+      </p>
     </div>)
   );
 }

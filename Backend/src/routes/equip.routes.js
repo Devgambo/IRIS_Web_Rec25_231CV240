@@ -1,5 +1,7 @@
 import { Router } from 'express';
-import { requireAuth } from '../middlewares/requireAuth';
+import { requireAuth } from '../middlewares/requireAuth.middleware.js';
+import { getAllEquip, getAllEquipsFromACat, addNewEquip ,updateEquip , deleteEquip } from '../controllers/equipControllers.js';
+
 
 const router = Router();
 

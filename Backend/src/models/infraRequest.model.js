@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import User from "./user.model";
-import Infrastructure from './infrastructure.model'
+import User from "./user.model.js";
+import Infrastructure from './infrastructure.model.js'
 
 const infraBookingSchema = new mongoose.Schema({
   userId: {

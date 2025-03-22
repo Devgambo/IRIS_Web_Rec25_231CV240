@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { requireAuth } from '../middlewares/requireAuth';
+import { requireAuth } from '../middlewares/requireAuth.middleware.js';
+import { createInfraReq, deleteInfraReq, getAllInfraReqs, getOneInfraReq, infraReqCompleted, infraReqPending, updateInfraReq } from '../controllers/infraReqControllers.js';
 
 const router = Router();
 
@@ -7,7 +8,7 @@ const router = Router();
 //get all the requests linked to a perticular user
 router.route("/pending").get(requireAuth, infraReqPending );
 router.route("/completed").get(requireAuth, infraReqCompleted );
-router.route("/").post(requireAuth , createInfraReq )
+router.route("/:infra_id").post(requireAuth , createInfraReq )
 
 //admin
 router.route("/").get(requireAuth, getAllInfraReqs);
