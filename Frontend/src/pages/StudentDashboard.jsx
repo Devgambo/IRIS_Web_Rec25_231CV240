@@ -1,32 +1,35 @@
 import React, { useState } from 'react'
 import ChipTabs from '@/components/Tabs'
-import CompletedReq from './student/History'
 import CurrentReq from './student/CurrentReq'
 import EquipmentShow from './student/EquipmentShow'
 import InfraShow from './student/InfraShow'
 import History from './student/History'
 import EquipmentList from './student/EquipmentList'
-import { useEffect } from 'react'
+import InfrastructureList from './student/InfrastructureList'
 
 function StudentDashboard() {
 
     const [selectedTab, setSelectedTab] = useState('Current Bookings')
-    const [showingListing, setShowingListing] = useState(false)
+    const [showingEquipListing, setShowingEquipListing] = useState(false)
+    const [showingInfraListing, setShowingInfraListing] = useState(false)
     const [cat_id, setCat_id] = useState();
 
     const renderComponent = () => {
 
-        if (showingListing) {
-            return <EquipmentList cat_id={cat_id} setShowingListing={setShowingListing} />
+        if (showingEquipListing) {
+            return <EquipmentList cat_id={cat_id} setShowingListing={setShowingEquipListing} />
+        }
+        if (showingInfraListing) {
+            return <InfrastructureList cat_id={cat_id} setShowingListing={setShowingInfraListing} />
         }
 
         switch (selectedTab) {
             case 'Current Bookings':
                 return <CurrentReq />;
             case 'Equipments':
-                return <EquipmentShow setCat_id={setCat_id} setShowingListing={setShowingListing} />;
+                return <EquipmentShow setCat_id={setCat_id} setShowingListing={setShowingEquipListing} />;
             case 'Infrastructure':
-                return <InfraShow />;
+                return <InfraShow setCat_id={setCat_id} setShowingListing={setShowingInfraListing}/>;
             case 'History':
                 return <History />;
             default:
@@ -38,7 +41,7 @@ function StudentDashboard() {
     return (
         <div className='m-5'>
             <div className={`${
-                showingListing 
+                showingEquipListing | showingInfraListing
                 ?"hidden"
                 :""
             }`}>

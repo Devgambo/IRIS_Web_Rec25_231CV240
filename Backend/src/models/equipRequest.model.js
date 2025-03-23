@@ -16,11 +16,21 @@ const equipmentRequestSchema = new mongoose.Schema({
    quantity: {
       type: Number, required: true
    },
-   duration: {
-      type: Number, required: true
+   bookingDate: {
+      type: Date,
+      required: true 
+   },
+   startTime: {
+      type: String,
+      required: true
+   },
+   endTime: {
+      type: String,
+      required: true
    },
    status: {
-      type: String, enum: ['pending', 'approved', 'rejected', 'cancelled','completed'],
+      type: String, 
+      enum: ['pending', 'approved', 'rejected', 'cancelled','completed'],
       default: 'pending'
    },
    adminComment: {

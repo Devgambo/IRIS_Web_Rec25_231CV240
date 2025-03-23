@@ -4,8 +4,13 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
-
+import { useUser } from "@clerk/clerk-react";
 const HeroPage = () => {
+    const { user } = useUser()
+
+    const role = user?.unsafeMetadata?.role;
+
+    const navigateTo = role === 'admin' ? '/dashboard-admin' : '/dashboard';
     return (
         <section className="w-full bg-black text-white py-20 px-6">
             <div className="max-w-7xl md:my-20 mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
@@ -28,7 +33,7 @@ const HeroPage = () => {
 
                     <div className="flex gap-4">
                         <SignedIn>
-                            <Link to={'/dashboard'}>
+                            <Link to={navigateTo}>
                                 <Button size="lg" className="bg-white/90 text-black hover:bg-white/40">
                                     Get Started <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>

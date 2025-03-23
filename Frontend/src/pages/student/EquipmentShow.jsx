@@ -2,8 +2,10 @@ import CatCard from '@/components/CategoryCard';
 import React from 'react';
 
 function EquipmentShow({ setShowingListing, setCat_id }) {
-    // Hardcoded data for now (replace with fetched data later)
-    //sabka kind equipment hoga
+
+
+    //TODO: Hardcoded data for now (replace with fetched data later) fetch all the categories
+    //sabka kind equipment hoga equipment
     const categories = [
         {
             _id: 1324,
@@ -41,7 +43,6 @@ function EquipmentShow({ setShowingListing, setCat_id }) {
                     onClick={() => {
                         setShowingListing(true);
                         setCat_id(category._id);
-                        console.log('hit')
                     }}
                     className="w-full text-left focus:outline-none"
                     aria-label={`Select ${category.name}`}

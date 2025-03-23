@@ -58,7 +58,7 @@ export const createInfraReq = asyncHandler(async (req,res) => {
         throw new ApiError(400, "Requested infra not available");
     }
 
-    const newInfraReq = await EquipmentRequest.create({
+    const newInfraReq = await InfraBooking.create({
         userId:userId,
         infrastructureId:infra_id ,
         bookingDate:bookingDate,
