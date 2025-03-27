@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import InfraLisCard from '@/components/InfraLisCard';
-import InfraReqForm from '@/components/InfraReqForm';
+import InfraLisCard from '@/components/student/InfraLisCard';
+import InfraReqForm from '@/components/student/InfraReqForm';
 
 function InfrastructureList({ cat_id, setShowingListing }) {
     const [showModal, setShowModal] = useState(false);

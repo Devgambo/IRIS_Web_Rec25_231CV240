@@ -1,12 +1,13 @@
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
-const tabs = ["Current Bookings", "Equipments", "Infrastructure", "History"];
-
-const ChipTabs = ({ selected, setSelected}) => {
+const ChipTabs = ({ selected, setSelected, tabs, className}) => {
 
   return (
-    <div className="relative top-15 bg-white/10 rounded-2xl px-4 py-5 m-10 flex items-center justify-around flex-wrap gap-8">
+    <div className={cn(
+      `relative top-15 bg-white/10 rounded-2xl px-4 py-5 m-10 flex items-center justify-around flex-wrap gap-8`,
+      className
+    )}>
       {tabs.map((tab) => (
         <Chip
           text={tab}

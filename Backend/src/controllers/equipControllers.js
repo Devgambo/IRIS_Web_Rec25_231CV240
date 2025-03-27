@@ -6,7 +6,9 @@ import Equipment from '../models/equipment.model.js'
 
 
 export const getAllEquip = asyncHandler(async (req, res) => {
-    const equipments = await Equipment.find();
+
+    //Changes: populated with catID
+    const equipments = await Equipment.find().populate('categoryId');
 
     if (equipments.length === 0) {
         throw new ApiError(409, "equipments fetching failed")
@@ -78,7 +80,6 @@ export const deleteEquip = asyncHandler(async (req, res) => {
         new ApiResponse(200,{},"equipment deleted")
     )
 })
-
 
 export const getAllEquipsFromACat = asyncHandler(async (req, res) => {
 

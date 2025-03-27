@@ -1,4 +1,4 @@
-import CatCard from '@/components/CategoryCard';
+import CatCard from '@/components/student/CategoryCard';
 import React from 'react';
 
 function EquipmentShow({ setShowingListing, setCat_id }) {

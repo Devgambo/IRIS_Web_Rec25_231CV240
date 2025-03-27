@@ -1,6 +1,6 @@
-import LisCard from '@/components/EquipLisCard';
+import LisCard from '@/components/student/EquipLisCard';
 import React, { useState } from 'react';
-import ReqForm from '@/components/EquipReqForm'
+import ReqForm from '@/components/student/EquipReqForm'
 
 function EquipmentList({ cat_id, setShowingListing }) {
 

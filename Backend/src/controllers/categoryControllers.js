@@ -23,14 +23,10 @@ export const getAllCategory = asyncHandler(async (req, res) => {
 export const createCategory = asyncHandler(async (req, res) => {
     const { name, description, kind } = req.body;
 
-    console.log("0000")
-    console.log(req.body)
-    // console.log()
     if (!name || !kind) {
         throw new ApiError(400, "Name and kind are required");
     }
     let coverImageUrl = "https://media.istockphoto.com/id/1255328634/photo/cricket-leather-ball-resting-on-bat-on-the-stadium-pitch.jpg?s=2048x2048&w=is&k=20&c=5YgTlWqX4GDDcMzS2vLGpbx3PcwuY1a64hlmfo9kfuc="; //placeholder image
-    console.log("1111111")
 
     if (req.file) {
         const cloudinaryResult = await uploadOnCloudinary(req.file.path);

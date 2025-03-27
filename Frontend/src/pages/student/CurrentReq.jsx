@@ -1,4 +1,4 @@
-import ListingCard from '@/components/ListingReqCard';
+import ListingCard from '@/components/student/ListingReqCard';
 import React, { useState } from 'react';
 
 function CurrentReq() {

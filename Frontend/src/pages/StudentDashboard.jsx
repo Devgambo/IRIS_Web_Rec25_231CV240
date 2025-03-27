@@ -37,6 +37,7 @@ function StudentDashboard() {
         }
     }
 
+    const tabs = ["Current Bookings", "Equipments", "Infrastructure", "History"];
 
     return (
         <div className='m-5'>
@@ -45,7 +46,7 @@ function StudentDashboard() {
                 ?"hidden"
                 :""
             }`}>
-                <ChipTabs selected={selectedTab} setSelected={setSelectedTab} />
+                <ChipTabs selected={selectedTab} setSelected={setSelectedTab} tabs={tabs} />
             </div>
             <div className='bg-white/15 my-20 md:m-10 md:my-20 md:p-5 rounded-xl'>
                 {renderComponent()}
