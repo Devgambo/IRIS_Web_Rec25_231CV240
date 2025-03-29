@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {z} from 'zod';
+import { z } from 'zod';
 import { motion } from 'framer-motion';
 import {
   Form,
@@ -15,6 +15,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 
+import { useAuth } from '@clerk/clerk-react';
+import { useCreateCatMutation } from '@/features/catSliceApi';
+
 // Schema for form validation
 const categoryFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -25,8 +28,9 @@ const categoryFormSchema = z.object({
 
 
 function CreateCategoryForm({ onSuccess }) {
-  const [isLoading, setIsLoading] = useState(false);
+
   const [previewImage, setPreviewImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const form = useForm({
     resolver: zodResolver(categoryFormSchema),
@@ -41,46 +45,49 @@ function CreateCategoryForm({ onSuccess }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setSelectedFile(file);
       form.setValue('coverImage', file);
       setPreviewImage(URL.createObjectURL(file));
     }
   };
 
+  const { getToken } = useAuth();
+  const [createCat, { isLoading }] = useCreateCatMutation();
+
+
   const onSubmit = async (values) => {
-    // try {
-    //   setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', values.name);
+      formData.append('description', values.description || '');
+      formData.append('kind', values.kind);
+      if (selectedFile) {
+        formData.append('coverImage', selectedFile);
+      }
       
-    //   const formData = new FormData();
-    //   formData.append('name', values.name);
-    //   formData.append('description', values.description || '');
-    //   formData.append('kind', values.kind);
-    //   if (values.coverImage) {
-    //     formData.append('file', values.coverImage);
-    //   }
+      // Debug - let's see what's in the FormData
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
 
-    //   const response = await axios.post('/api/categories', formData, {
-    //     headers: {
-    //       'Content-Type': 'multipart/form-data'
-    //     }
-    //   });
+      const token = await getToken();
 
-    //   toast({
-    //     title: "Success",
-    //     description: "Category created successfully",
-    //   });
+      const response = await createCat({
+        data: formData,
+        token
+      }).unwrap();
 
-    //   form.reset();
-    //   setPreviewImage(null);
-    //   onSuccess?.(); // Callback for parent component
-    // } catch (error) {
-    //   toast({
-        // title: "Error",
-        // description: error.response?.data?.message || "Failed to create category",
-        // variant: "destructive",
-    //   });
-    // } finally {
-    //   setIsLoading(false);
-    // }
+      console.log(response);
+      //TODO_toaster
+      form.reset();
+      setSelectedFile(null);
+      setPreviewImage(null);
+
+      onSuccess?.(); // Callback for parent component
+    } catch (err) {
+      console.error("❌ Error in creating category", err);
+      
+    }
   };
 
   return (
@@ -146,7 +153,7 @@ function CreateCategoryForm({ onSuccess }) {
           <FormField
             control={form.control}
             name="coverImage"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>Cover Image</FormLabel>
                 <FormControl>
@@ -156,7 +163,7 @@ function CreateCategoryForm({ onSuccess }) {
                       accept="image/*"
                       onChange={handleImageChange}
                       className="cursor-pointer bg-black text-white/50"
-                      {...field}
+                      value=""
                     />
 
                     {previewImage && (
@@ -184,7 +191,7 @@ function CreateCategoryForm({ onSuccess }) {
             >
               {isLoading ? (
                 <>
-                    loading...
+                  loading...
                   {/* TODO_loader */}
                 </>
               ) : (

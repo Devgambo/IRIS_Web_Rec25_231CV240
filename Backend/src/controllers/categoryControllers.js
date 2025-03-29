@@ -9,7 +9,8 @@ import Infrastructure from "../models/infrastructure.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 export const getAllCategory = asyncHandler(async (req, res) => {
-    const { type } = req.body;
+    const { type } = req.query;
+    console.log(type);
     const categories = await Category.find({ kind: type });
     if (!categories.length) {
         throw new ApiError(404, "No categories found");
@@ -21,6 +22,9 @@ export const getAllCategory = asyncHandler(async (req, res) => {
 })
 
 export const createCategory = asyncHandler(async (req, res) => {
+
+    console.log("hitted")
+
     const { name, description, kind } = req.body;
 
     if (!name || !kind) {
@@ -73,4 +77,20 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     return res.json(
         new ApiResponse(200, {}, "Category and its related data deleted")
     );
+})
+
+export const updateCategory = asyncHandler(async(req,res)=>{
+    const {id} = req.params;
+    const category = await Category.findById(id);
+
+    if (!category) {
+        throw new ApiError(404, "Category not found");
+    }
+
+    const newCat = await Category.findByIdAndUpdate(id,req.body);
+
+    return res.json(
+        new ApiResponse(200, {newCat}, "Category updated!")
+    );
+
 })

@@ -20,6 +20,8 @@ export const getAllEquip = asyncHandler(async (req, res) => {
 })
 
 export const addNewEquip = asyncHandler(async (req, res) => {
+    console.log('addnewEquip hit')
+    console.log(req.body);
     const { name, categoryId, quantity, availableQuantity, description } = req.body;
 
     const newEquip = await Equipment.create({
@@ -40,21 +42,13 @@ export const addNewEquip = asyncHandler(async (req, res) => {
 })
 
 export const updateEquip = asyncHandler(async (req, res) => {
+
     const { id } = req.params
     const equip = await Equipment.findById(id);
     if (!equip) {
         throw new ApiError(409, "Equipment couldn't fetch")
     }
-
-    const allowedUpdates = ['name', 'condition', 'description', 'quantity', 'availableQuantity'];
-    const updates = Object.keys(req.body);
-
-    const isValidOperation = updates.every(update => allowedUpdates.includes(update));
-    if (!isValidOperation) {
-        throw new ApiError(400, 'Invalid updates!');
-    }
-
-
+    
     //I need to update anyfeild that come in req.body eg:condition and discription or increasing/dec the available quantity of equipment whenever someone gets there request verified or completed.
     const new_equip = await Equipment.findByIdAndUpdate(id, req.body, { new: true });
     if (!new_equip) {

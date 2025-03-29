@@ -1,6 +1,4 @@
-//TODO: get; All the categories. {we'll need this as options for selecting category and saving data to db}
-//TODO: send post; req to create new equipment 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,14 +25,34 @@ const equipFormSchema = z.object({
   description: z.string().min(10, "Description should be at least 10 characters"),
 });
 
-function CreateEquipForm({ onSuccess }) {
-  const [isLoading, setIsLoading] = useState(false);
-  // TODO: Fetch categories from your API
-  const [categories, setCategories] = useState([
-    { _id: '1', name: 'Cricket' },
-    { _id: '2', name: 'Tennis' },
-  ]);
 
+import { useGetCatsQuery } from '@/features/catSliceApi'; 
+import { useCreateEquipMutation } from '@/features/equipSliceApi';
+import { useAuth } from '@clerk/clerk-react';
+import { Loader2 } from 'lucide-react';
+
+
+function CreateEquipForm({ onSuccess }) {
+  const {getToken} = useAuth();
+  const [token, setToken] = useState(null);
+  const type = 'equipment';
+  
+  useEffect(() => {
+    const fetchToken = async () => {
+      const fetchedToken = await getToken();
+      setToken(fetchedToken);
+    };
+    fetchToken();
+  }, [getToken]);
+
+  const { data: categoriesData, isLoading: fetchingCat, error: categoryError } = useGetCatsQuery(
+    { token, type },
+    { skip: !token } // Skip query until token is available
+  );
+  
+  const categories = categoriesData?.data?.categories || [];
+  const [createEquip, {isLoading}] = useCreateEquipMutation();
+  
   const form = useForm({
     resolver: zodResolver(equipFormSchema),
     defaultValues: {
@@ -48,20 +66,23 @@ function CreateEquipForm({ onSuccess }) {
 
   const onSubmit = async (values) => {
     try {
-      setIsLoading(true);
-      // TODO: Implement your API call
       console.log('Submitting:', values);
-      /*
-      const response = await axios.post('/api/equipments', {
-        ...values,
-        categoryId: parseInt(values.categoryId) // Convert back to number if needed
-      });
-      */
+      const payload = {...values, categoryId: values.categoryId};
+      
+      console.log("payload: ", payload);
+
+      const currentToken = await getToken();
+      
+      const response = await createEquip({
+        data: payload,
+        token: currentToken
+      }).unwrap();
+      
+      console.log(response);
+      form.reset();
       onSuccess?.();
     } catch (error) {
       console.error('Error creating equipment:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -191,8 +212,8 @@ function CreateEquipForm({ onSuccess }) {
             >
               {isLoading ? (
                 <>
-                loading...
-                {/* TODO_loader */}
+                <Loader2 className="h-4 w-4 animate-spin" />
+                creating...
                 </>
               ) : 'Create Equipment'}
             </Button>

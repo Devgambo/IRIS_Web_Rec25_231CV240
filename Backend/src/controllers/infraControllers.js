@@ -15,6 +15,9 @@ export const getAllInfra = asyncHandler(async (req, res) => {
 export const addNewInfra = asyncHandler(async (req, res) => {
     const { name, categoryId, location, capacity, description, timeSlots } = req.body;
 
+    console.log("create new infra hit")
+    console.log(req.body)
+    
     if (!name || !categoryId || !location || !capacity) {
         throw new ApiError(400, "Missing required fields");
     }
@@ -44,14 +47,6 @@ export const updateInfra = asyncHandler(async (req, res) => {
         throw new ApiError(409, "Infrastructure couldn't fetch")
     }
 
-    const allowedUpdates = ['name', 'condition', 'description', 'capacity', 'availability','timeSlots'];
-    const updates = Object.keys(req.body);
-
-    const isValidOperation = updates.every(update => allowedUpdates.includes(update));
-    if (!isValidOperation) {
-        throw new ApiError(400, 'Invalid updates!');
-    }
-
     const new_infra = await Infrastructure.findByIdAndUpdate(id, req.body, { new: true });
     
     if (!new_infra) {
@@ -66,6 +61,7 @@ export const updateInfra = asyncHandler(async (req, res) => {
 
 export const deleteInfra = asyncHandler(async (req, res) => {
     const { id } = req.params
+    console.log("id:",id)
     const infra = await Infrastructure.findById(id);
     if (!infra) {
         throw new ApiError(409, "Infrastructure couldn't fetch")

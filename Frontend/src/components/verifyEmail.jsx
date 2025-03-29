@@ -25,7 +25,7 @@ export default function VerifyEmail() {
         return;
       }
 
-      const token = await getToken(); // Optional: { template: 'your-template-name' }
+      const token = await getToken();
 
       console.log("token:", token);
 

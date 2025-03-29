@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,6 +17,11 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+import { useAuth } from '@clerk/clerk-react';
+import { useGetCatsQuery } from '@/features/catSliceApi';
+import { useCreateInfraMutation } from '@/features/infraSliceApi';
+
+
 // Schema for form validation
 const infraFormSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -28,12 +33,25 @@ const infraFormSchema = z.object({
 });
 
 function CreateInfraForm({ onSuccess }) {
-    const [isLoading, setIsLoading] = useState(false);
-    // TODO:(get) Fetch categories from your API
-    const [categories, setCategories] = useState([
-        { _id: '1', name: 'Cricket' },
-        { _id: '2', name: 'Tennis' },
-    ]);
+    const { getToken } = useAuth();
+    const [token, setToken] = useState();
+    const type = 'infrastructure';
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const fetchedToken = await getToken();
+            setToken(fetchedToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    const { data: categoriesData, isLoading: fetchingCat, error: categoryError } = useGetCatsQuery(
+        { token, type },
+        { skip: !token }
+    );
+
+    const categories = categoriesData?.data?.categories || [];
+    const [createInfra, {isLoading}] = useCreateInfraMutation();
 
     const form = useForm({
         resolver: zodResolver(infraFormSchema),
@@ -49,20 +67,20 @@ function CreateInfraForm({ onSuccess }) {
 
     const onSubmit = async (values) => {
         try {
-            setIsLoading(true);
-            // TODO: Implement your API call (post)
             console.log('Submitting:', values);
-            /*
-            const response = await axios.post('/api/infrastructure', {
-              ...values,
-              categoryId: values.categoryId
-            });
-            */
+            const payload = {...values , categoryId: values.categoryId};
+            console.log("payload: ",payload);
+            const currentToken = await getToken();
+            const response = await createInfra({
+                data:payload,
+                token: currentToken
+            }).unwrap();
+
+            console.log(response)
+            form.reset();
             onSuccess?.();
         } catch (error) {
             console.error('Error creating infrastructure:', error);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -138,13 +156,13 @@ Example:
 6:00pm
 7:00pm"
 
-                                    className="min-h-[100px] bg-gray-800 text-white"
-                                    value={field.value ? field.value.join('\n') : ''} // Display as multi-line text {BUG : dikkat h yaha}
-                                    onChange={(e) => {
-                                        const rawText = e.target.value; // Preserve the actual input
-                                        const slots = rawText.split('\n').map((slot) => slot.trim()).filter(Boolean);
-                                        field.onChange(slots);
-                                    }}
+                                        className="min-h-[100px] bg-gray-800 text-white"
+                                        // value={field.value ? field.value.join('\n') : ''} {BUG}
+                                        onChange={(e) => {
+                                            const rawText = e.target.value; // Preserve the actual input
+                                            const slots = rawText.split('\n').map((slot) => slot.trim()).filter(Boolean);
+                                            field.onChange(slots);
+                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage className="text-red-500" />

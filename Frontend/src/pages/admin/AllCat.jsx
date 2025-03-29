@@ -1,71 +1,108 @@
 import LisCard from '@/components/admin/LisCard';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from "framer-motion";
 import UpdateShowForm from './forms/UpdateShowForm';
+import { useAuth } from '@clerk/clerk-react';
+import { useGetCatsQuery } from '@/features/catSliceApi';
+import { useDeleteCatMutation } from '@/features/catSliceApi';
+import { useUpdateCatMutation } from '@/features/catSliceApi';
 
 function AllCat() {
+    const { getToken } = useAuth();
 
+    const [token, setToken] = useState();
+    useEffect(() => {
+        const fetchToken = async () => {
+            const fetchedToken = await getToken();
+            setToken(fetchedToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    const typeE = 'equipment';
+    const typeI = 'infrastructure';
+    const { data: Equipcat, isLoading: fetchingECat } = useGetCatsQuery({ token, type: typeE }, { skip: !token });
+    const { data: Infracat, isLoading: fetchingICat } = useGetCatsQuery({ token, type: typeI }, { skip: !token });
     const [selectedCat, setSelectedCat] = useState();
     const [modelOpen, setModelOpen] = useState(false);
-    const [loading, setLoading] = useState();  //Were're using rtq query
 
+    const [deleteCat , {isLoading:deleting}] = useDeleteCatMutation();
+    const [updateCat , {isLoading:updating}] = useUpdateCatMutation()
 
-    //hard coded for now ,we'll fetch later
-    //TODO: fetch all the cats
-    const cats = [
-        {
-            _id:1,
-            name:'Cricket',
-            description: 'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Possimus impedit in sint.',
-            kind:'equipment'
-        }
-    ]
+    const Ecats = Equipcat?.data?.categories || [];
+    const Icats = Infracat?.data?.categories || [];
 
-    const handleCatClick = (cat)=>{
+    const handleCatClick = (cat) => {
         setSelectedCat(cat);
         setModelOpen(true);
     }
-    
 
-    //TODO: update cat req
-    const handleSubmit = async (formdata)=>{
+
+    const handleSubmit = async (formdata) => {
         console.log('Form submitted:', formdata);
         try {
-            setLoading(true);
-            // Your API call would look like:
-            // const response = await axios.put(
-            //   `/api/cat-requests/${selectedRequest._id}`,
-            //   formData
-            // );
+            const currentToken = await getToken();
+            const response = await updateCat({token:currentToken,id:formdata.id,data:formdata})
+            console.log(response);
             setModelOpen(false);
-          } catch (error) {
+        } catch (error) {
             console.error('Error:', error);
-          } finally {
-            // setLoading(false);
-          }
+        }
     }
 
-    //TODO: delete cat req
-    const handleDelete = async (formdata) =>{
-        console.log('we have _id here')
-        console.log('Form submitted for delete:', formdata);
-
+    //TODO_toster
+    const handleDelete = async (formdata) => {
+        try {
+            console.log('id:', formdata);
+            const currentToken = await getToken();
+            const response = await deleteCat({token:currentToken , id:formdata});
+            console.log(response);
+        } catch (err) {
+            console.log(err);
+        }
     }
 
+//TODO_loader
     return (
         <div className='space-y-3 p-4'>
-            {cats.map((cat,index) => (
+            <div className='w-full text-xl underline'> Equipment Categories: </div>
+            {fetchingECat &&
+                <>Loading...</>
+            }
+            {Ecats.map((cat, index) => (
                 <motion.div
-                    key = {cat._id}
+                    key={cat._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }} 
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
                     <LisCard
-                        index={index+1}
+                        index={index + 1}
                         name={cat.name}
                         kind={cat.kind}
-                        onClick={()=>handleCatClick(cat)}
+                        onClick={() => handleCatClick(cat)}
+                    />
+
+                </motion.div>
+            ))}
+
+            <div className='w-full text-xl underline'> Infrastructure Categories: </div>
+
+            {fetchingICat &&
+                <>Loading...</>
+            }
+            {Icats.map((cat, index) => (
+                <motion.div
+                    key={cat._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                    <LisCard
+                        index={index + 1}
+                        name={cat.name}
+                        kind={cat.kind}
+                        onClick={() => handleCatClick(cat)}
                     />
 
                 </motion.div>
@@ -77,9 +114,8 @@ function AllCat() {
                 data={selectedCat}
                 onSubmit={handleSubmit}
                 onDelete={handleDelete}
-                loading={loading}
+                loading={deleting||updating}
             />
-
         </div>
     )
 }

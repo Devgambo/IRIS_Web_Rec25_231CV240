@@ -48,7 +48,7 @@ const UpdateShowForm = ({
             quantity: data?.quantity || "",
             availableQuantity: data?.availableQuantity || "",
             condition: data?.condition || "",
-            desc: data?.description || "",
+            description: data?.description || "",
             //infra special
             location: data?.location || "",
             capacity: data?.capacity || "",
@@ -67,7 +67,7 @@ const UpdateShowForm = ({
                 quantity: data?.quantity || "",
                 availableQuantity: data?.availableQuantity || "",
                 condition: data?.condition || "",
-                desc: data?.description || "",
+                description: data?.description || "",
                 //infra special
                 location: data?.location || "",
                 capacity: data?.capacity || "",
@@ -85,8 +85,10 @@ const UpdateShowForm = ({
     //ONSUBMIT() called
     const handleSubmitChanges = () => {
         const formData = form.getValues();
-        console.log("submit triggered", formData)
-        onSubmit(formData);
+        const id = data._id;
+        const payload = {...formData,id}
+        console.log("submit triggered", payload)
+        onSubmit(payload);
         setIsEditing(false);
     };
 
@@ -99,7 +101,7 @@ const UpdateShowForm = ({
                 quantity: data?.quantity || "",
                 availableQuantity: data?.availableQuantity || "",
                 condition: data?.condition || "",
-                desc: data?.description || "",
+                description: data?.description || "",
                 //infra special
                 location: data?.location || "",
                 capacity: data?.capacity || "",
@@ -414,7 +416,7 @@ const UpdateShowForm = ({
                                 {/* Description field */}
                                 <FormField
                                     control={form.control}
-                                    name="desc"
+                                    name="description"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Description</FormLabel>
