@@ -90,7 +90,7 @@ function History() {
     return (
         <div className="p-4">
             <h1 className="text-2xl font-semibold mb-6">History:</h1>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[80vh] overflow-scroll">
                 {history.length === 0 ? (
                     <div className="text-center text-gray-500">No history found.</div>
                 ) : (
