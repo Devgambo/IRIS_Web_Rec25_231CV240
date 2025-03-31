@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import dotenv from "dotenv";
 
 //imports
 import userRouter from "./routes/user.routes.js"
@@ -11,9 +12,13 @@ import categoryRouter from "./routes/category.routes.js"
 
 const app = express()
 
+dotenv.config({
+    path: './.env'
+})
+
 // CORS config
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.CORS_ORIGIN,
     credentials: true
 }));
 

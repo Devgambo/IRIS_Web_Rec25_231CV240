@@ -1,22 +1,26 @@
 {
-  "name": "backend",
-  "type": "module",
+  "name": "nitk-sportsmate-backend",
   "version": "1.0.0",
-  "description": "backend for NITK_SportsMate",
-  "main": "index.js",
+  "description": "Backend for NITK SportsMate",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
+    "start": "node src/index.js",
     "dev": "nodemon src/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@clerk/clerk-sdk-node": "^4.13.23",
+    "@clerk/clerk-sdk-node": "^4.8.1",
     "cloudinary": "^2.6.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "mongoose": "^8.12.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.3",
     "multer": "^1.4.5-lts.2",
     "resend": "^4.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
