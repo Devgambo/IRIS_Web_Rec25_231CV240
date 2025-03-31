@@ -465,7 +465,7 @@ const UpdateShowForm = ({
                                             <Button
                                                 type="button"
                                                 variant="outline"
-                                                className={'text-black hover:text-white'}
+                                                className={'text-black'}
                                                 onClick={handleCancel}
                                                 disabled={loading}
                                             >
@@ -480,9 +480,9 @@ const UpdateShowForm = ({
                                                 { loading ? (
                                                     <div className="flex items-center gap-2">
                                                     <Loader2 className="h-4 w-4 animate-spin" />
-                                                    Deleting...
+                                                    Updating...
                                                 </div>
-                                                ):'Delete'}
+                                                ):'Update'}
                                             </Button>
                                         </>
                                     )}

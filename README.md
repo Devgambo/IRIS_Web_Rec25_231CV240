@@ -107,6 +107,4 @@ npm run dev
 - Panelty system for students damaging the infra or equipments
 
 
----
-
 

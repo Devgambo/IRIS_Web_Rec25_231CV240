@@ -7,8 +7,10 @@ import User from '../models/user.model.js';
 export const sendReminderEmail = async (booking, user, infrastructure) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'notifications@nitk_SportsMate.com',
+      // from: 'onboarding@resend.dev',
+      from:"production domain name",
       to: user.email,
+      // to: 'priyanshukumarrai.231cv240@nitk.edu.in', //for testing purpose...
       subject: 'Reminder: Your booking is coming up soon',
       html: `
         <h1>Booking Reminder</h1>

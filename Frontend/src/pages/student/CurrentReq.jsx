@@ -134,7 +134,7 @@ function CurrentReq() {
                 )}
             </div>
             <div className='rounded-xl bg-gray-800/30 backdrop-blur-sm border border-gray-700/50 m-2 p-6'>
-                <h1 className='text-2xl font-semibold mb-6 text-white'>Verified/Rejected Requests:</h1>
+                <h1 className='text-2xl font-semibold mb-6 text-white'>Verified Requests:</h1>
                 {fetchingIVR || fetchingEVR ? (
                     <>
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -151,7 +151,7 @@ function CurrentReq() {
                         />
                     ))
                 ) : (
-                    <div className="text-gray-400 text-center py-4">No verified/rejected requests</div>
+                    <div className="text-gray-400 text-center py-4">No verified requests</div>
                 )}
             </div>
         </div>
