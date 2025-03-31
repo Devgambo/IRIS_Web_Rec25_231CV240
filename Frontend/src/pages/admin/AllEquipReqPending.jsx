@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import ReqCard from "@/components/admin/reqCard";
+import ReqCard from "@/components/admin/ReqCard";
 import RequestDetailsForm from "./forms/ReqDetailsForm";
 import { useAuth } from "@clerk/clerk-react";
 import { useGetRequestsQuery, useUpdateRequestMutation } from "@/features/reqEquipSliceApi";
