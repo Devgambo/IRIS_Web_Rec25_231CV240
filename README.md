@@ -29,19 +29,27 @@ NITK SportsMate allows users to book various sports facilities on campus and pro
 ```
 NITK_SportsMate/
 ├── Backend/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middleware/
-│   ├── utils/
-│   ├── index.js
+|    ├──src/
+│       ├── controllers/
+│       ├── models/
+│       ├── routes/
+│       ├── middleware/
+│       ├── utils/
+│       ├── index.js
+│       ├── app.js
+│       ├── dbConnect.js
 ├── Frontend/
 │   ├── src/
+│   │   ├── app/
+│   │   ├── assets/
 │   │   ├── components/
+│   │   ├── features/
+│   │   ├── lib/
 │   │   ├── pages/
-│   │   ├── redux/
+│   │   ├── utils/
 │   │   ├── App.jsx
 │   │   ├── index.js
+│   │   ├── index.css
 │   └── public/
 ├── package.json
 ├── README.md
