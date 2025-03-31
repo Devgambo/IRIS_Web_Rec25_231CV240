@@ -106,5 +106,12 @@ npm run dev
 - Improving the admin statistics page
 - Panelty system for students damaging the infra or equipments
 
+## Schema relation diagram:
+![Screenshot 2025-03-31 183029](https://github.com/user-attachments/assets/a00b4ed2-b5fd-40ff-9ce3-101f7c40fa78)
+
+
+## Vedio of me explaining all the features:)
+### [Watch this video on YouTube](https://youtu.be/i9yWtDvJu_0)
+
 
 
