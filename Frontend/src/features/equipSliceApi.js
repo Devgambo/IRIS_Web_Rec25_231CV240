@@ -15,7 +15,7 @@ export const equipApiSlice = apiSlice.injectEndpoints({
                 }
             },
 
-            //debugging purposes
+            
             async onQueryStarted(arg, { queryFulfilled }) {
                 try {
                     await queryFulfilled;

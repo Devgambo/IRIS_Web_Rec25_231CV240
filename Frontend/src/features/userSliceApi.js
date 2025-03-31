@@ -15,13 +15,21 @@ export const authApiSlice = apiSlice.injectEndpoints({
             })
         }),
 
+        getStatistics: builder.query({
+            query: ({token})=>({
+                url:'/user/admin/statistics',
+                method:'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+        })
+
         //rest..
-
-
     }),
 })
 
 export const { 
     useSignupMutation,
-    
+    useGetStatisticsQuery
 } = authApiSlice;

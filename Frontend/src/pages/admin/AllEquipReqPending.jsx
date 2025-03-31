@@ -1,58 +1,59 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import ReqCard from "@/components/admin/reqCard";
 import RequestDetailsForm from "./forms/ReqDetailsForm";
-// import { useToast } from "@/components/ui/use-toast";
-
+import { useAuth } from "@clerk/clerk-react";
+import { useGetRequestsQuery, useUpdateRequestMutation } from "@/features/reqEquipSliceApi";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 function AllEquipReqPending() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);            //Were're using rtq query
-//   const { toast } = useToast();
+  const { getToken } = useAuth();
 
-  // Mock data - replace with your actual data fetching logic
-  const equipmentReqs = [
-    {
-      _id: "1",
-      userId: { name: "John Doe" },
-      equipmentId: { name: "Cricket Ball" },
-      quantity: 3,
-      bookingDate: "2023-12-24T00:00:00.000Z",
-      startTime: "10:00",
-      endTime: "12:00",
-      status: "pending",
-    },
-  ];
+  const [token, setToken] = useState();
+  useEffect(() => {
+    const fetchToken = async () => {
+      const fetchedToken = await getToken();
+      setToken(fetchedToken);
+    };
+    fetchToken();
+  }, [getToken]);
+
+  const { data: Reqs, isLoading: fetching } = useGetRequestsQuery({ token });
+  const [updateRequest, { isLoading: updating }] = useUpdateRequestMutation();
+
+  const equipmentReqs = Reqs?.data?.allreqs || [];
 
   const handleReqClick = (req) => {
     setSelectedRequest(req);
     setModalOpen(true);
   };
 
-
-  //TODO: api to update the status
   const handleSubmit = async (formData) => {
-    console.log('33333')
-    console.log('Form submitted:', formData);
     try {
-      setLoading(true);
-      // Your API call would look like:
-      // const response = await axios.put(
-      //   `/api/equipment-requests/${selectedRequest._id}`,
-      //   formData
-      // );
+      const currentToken = await getToken();
+      const response = await updateRequest({ token: currentToken, data: formData, id: selectedRequest._id }).unwrap();
+      console.log("response:", response);
+      toast.success("Request approved!")
       setModalOpen(false);
     } catch (error) {
+      toast.error("could not send request")
       console.error('Error:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
 
   return (
     <div className="space-y-3 p-4">
+      {fetching && (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          fetching...
+        </>
+      )}
+
       {equipmentReqs.map((req, index) => (
         <motion.div
           key={req._id}
@@ -61,7 +62,7 @@ function AllEquipReqPending() {
           transition={{ duration: 0.3, delay: index * 0.05 }}
         >
           <ReqCard
-            name={req.equipmentId.name}
+            name={req.equipmentId?.name}
             quantity={req.quantity}
             bookingDate={new Date(req.bookingDate).toLocaleDateString()}
             index={index + 1}
@@ -75,7 +76,7 @@ function AllEquipReqPending() {
         onOpenChange={setModalOpen}
         requestData={selectedRequest}
         onSubmit={handleSubmit}
-        loading={loading}
+        loading={updating}
       />
     </div>
   );

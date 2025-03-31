@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@clerk/clerk-react';
 import { useGetCatsQuery } from '@/features/catSliceApi';
 import { useCreateInfraMutation } from '@/features/infraSliceApi';
+import toast from 'react-hot-toast';
 
 
 // Schema for form validation
@@ -77,9 +78,11 @@ function CreateInfraForm({ onSuccess }) {
             }).unwrap();
 
             console.log(response)
+            toast.success("Infra created successfully")
             form.reset();
             onSuccess?.();
         } catch (error) {
+            toast.error("Error while creating infra")
             console.error('Error creating infrastructure:', error);
         }
     };
@@ -157,7 +160,7 @@ Example:
 7:00pm"
 
                                         className="min-h-[100px] bg-gray-800 text-white"
-                                        // value={field.value ? field.value.join('\n') : ''} {BUG}
+                                        // value={field.value ? field.value.join('\n') : ''} //{BUG}
                                         onChange={(e) => {
                                             const rawText = e.target.value; // Preserve the actual input
                                             const slots = rawText.split('\n').map((slot) => slot.trim()).filter(Boolean);

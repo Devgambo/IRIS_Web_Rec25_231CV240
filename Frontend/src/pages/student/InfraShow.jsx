@@ -1,23 +1,34 @@
 import CatCard from '@/components/student/CategoryCard';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
+import { useGetCatsQuery } from '@/features/catSliceApi';
+import { Loader2 } from 'lucide-react';
 
-function InfraShow({ setShowingListing, setCat_id }){
-    //TODO: Hardcoded data for now (replace with fetched data later)
-    const categories = [
-        {
-            _id:1324,
-            name: "Cricket",
-            description: "Bats, balls, and more for cricket enthusiasts.",
-            coverImage: "https://media.istockphoto.com/id/1255328634/photo/cricket-leather-ball-resting-on-bat-on-the-stadium-pitch.jpg?s=2048x2048&w=is&k=20&c=5YgTlWqX4GDDcMzS2vLGpbx3PcwuY1a64hlmfo9kfuc=",
-        },
-        {
-            _id:1764,
-            name: "Football Gear",
-            description: "Everything you need for a great football match.",
-            coverImage: "https://via.placeholder.com/400x200",
-        },
-    ];
+function InfraShow({ setShowingListing, setCat_id, setCat_img }) {
 
+    const { getToken } = useAuth();
+    const [token, setToken] = useState();
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const fetchedToken = await getToken();
+            setToken(fetchedToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    const { data: categoriesData, isLoading } = useGetCatsQuery({
+        token,
+        type: 'infrastructure'
+    }, { skip: !token });
+
+    const categories = categoriesData?.data?.categories || [];
+
+    if (isLoading) {
+        return <>
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading Categories...
+        </>
+    }
     return (
         <div className='m-5 grid grid-cols-1 md:grid-cols-3 gap-6'>
             {categories.map((category, index) => (
@@ -26,6 +37,7 @@ function InfraShow({ setShowingListing, setCat_id }){
                     onClick={() => {
                         setShowingListing(true);
                         setCat_id(category._id);
+                        setCat_img(category.coverImage);
                         console.log('hit')
                     }}
                     className="w-full text-left focus:outline-none"

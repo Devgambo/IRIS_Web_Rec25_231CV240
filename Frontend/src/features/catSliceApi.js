@@ -21,7 +21,6 @@ export const catApiSlice = apiSlice.injectEndpoints({
         getCats: builder.query({
             query: ({ token, type }) => {
                 if (!token) {
-                    // Skip query if token is not available yet
                     return { skip: true };
                 }
                 console.log(`Fetching categories with type: ${type}`);
@@ -64,7 +63,7 @@ export const catApiSlice = apiSlice.injectEndpoints({
                 }
             }),
             invalidatesTags:['Categories']
-        })
+        }),
     })
 })
 

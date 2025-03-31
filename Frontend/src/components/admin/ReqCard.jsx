@@ -21,7 +21,7 @@ const cardVariants = {
 function ReqCard({ name, quantity, bookingDate, index, onClick }) {
   return (
     <motion.div
-      className="w-full md:w-[40%] bg-white/15 rounded-lg p-3 mb-2 cursor-pointer"
+      className="w-full bg-white/15 rounded-lg p-3 mb-2 cursor-pointer"
       variants={cardVariants}
       initial="hidden"
       animate="visible"

@@ -5,13 +5,12 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import Infrastructure from '../models/infrastructure.model.js'
 
 export const getAllInfra = asyncHandler(async (req, res) => {
-    const infras = await Infrastructure.find();
+    const infras = await Infrastructure.find().populate('categoryId');;
 
     return res.json(
         new ApiResponse(200, { infras }, infras.length ? "All infrastructure fetched!" : "No infrastructure found")
     )
 })
-
 export const addNewInfra = asyncHandler(async (req, res) => {
     const { name, categoryId, location, capacity, description, timeSlots } = req.body;
 

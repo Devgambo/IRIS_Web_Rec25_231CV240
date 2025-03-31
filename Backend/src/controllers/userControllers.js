@@ -3,6 +3,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 import User from "../models/user.model.js"
+import InfraBooking from '../models/infraRequest.model.js';
+import EquipmentRequest from '../models/equipRequest.model.js';
 
 export const createUser = asyncHandler(async (req, res) => {
     const { userId } = req.auth; // Clerk verified user ID
@@ -34,7 +36,6 @@ export const createUser = asyncHandler(async (req, res) => {
     )
 })
 
-
 //only admin can access all users
 export const getAllUsers = asyncHandler(async(req,res)=>{
     const { userId } = req.auth;
@@ -55,3 +56,23 @@ export const getAllUsers = asyncHandler(async(req,res)=>{
 
 })
 
+
+export const getStatistics = asyncHandler(async (req, res) => {
+    const totalUsers = await User.countDocuments();
+    const totalInfraBookings = await InfraBooking.countDocuments();
+    const totalEquipmentRequests = await EquipmentRequest.countDocuments();
+    const pendingInfraBookings = await InfraBooking.countDocuments({ status: 'pending' });
+    const pendingEquipmentRequests = await EquipmentRequest.countDocuments({ status: 'pending' });
+    
+    const statistics = {
+        totalUsers,
+        totalInfraBookings,
+        totalEquipmentRequests,
+        pendingInfraBookings,
+        pendingEquipmentRequests
+    };
+
+    return res.json(
+        new ApiResponse(200, {statistics}, "statistics fetched")
+    )
+});

@@ -28,6 +28,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
 
 const UpdateShowForm = ({
@@ -372,10 +373,7 @@ const UpdateShowForm = ({
                                                             disabled={!isEditing}
                                                             value={Array.isArray(field.value) ? field.value.join('\n') : field.value}
                                                             onChange={(e) => {
-                                                                const timeSlots = e.target.value
-                                                                    .split('\n')
-                                                                // .map(slot => slot.trim())
-                                                                // .filter(slot => slot !== '');
+                                                                const timeSlots = e.target.value.split('\n')
                                                                 field.onChange(timeSlots);
                                                                 console.log("timeslots:")
                                                                 console.log(timeSlots)
@@ -442,14 +440,24 @@ const UpdateShowForm = ({
                                                 onClick={handleDelete}
                                                 disabled={loading}
                                             >
-                                                Delete
+                                                { loading ? (
+                                                    <div className="flex items-center gap-2">
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                    Deleting...
+                                                </div>
+                                                ):'Delete'}
                                             </Button>
                                             <Button
                                                 type="button"
                                                 onClick={handleUpdate}
                                                 disabled={loading}
                                             >
-                                                Update
+                                                 { loading ? (
+                                                    <div className="flex items-center gap-2">
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                    Updating...
+                                                </div>
+                                                ):'Update' }
                                             </Button>
                                         </>
                                     ) : (
@@ -457,10 +465,11 @@ const UpdateShowForm = ({
                                             <Button
                                                 type="button"
                                                 variant="outline"
-                                                className={'text-black'}
+                                                className={'text-black hover:text-white'}
                                                 onClick={handleCancel}
                                                 disabled={loading}
                                             >
+
                                                 Cancel
                                             </Button>
                                             <Button
@@ -468,7 +477,12 @@ const UpdateShowForm = ({
                                                 onClick={handleSubmitChanges}
                                                 disabled={loading}
                                             >
-                                                Done
+                                                { loading ? (
+                                                    <div className="flex items-center gap-2">
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                    Deleting...
+                                                </div>
+                                                ):'Delete'}
                                             </Button>
                                         </>
                                     )}
@@ -492,7 +506,7 @@ const UpdateShowForm = ({
                     <AlertDialogFooter>
                         <AlertDialogCancel
                             onClick={cancelDelete}
-                            className="bg-transparent border border-white/30 text-white hover:bg-white/10"
+                            className="bg-transparent border border-white/30 text-white hover:bg-white/40"
                         >
                             Cancel
                         </AlertDialogCancel>

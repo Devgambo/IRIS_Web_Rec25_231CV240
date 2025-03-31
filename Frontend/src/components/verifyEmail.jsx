@@ -1,7 +1,8 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { useSignUp, useAuth, useUser } from '@clerk/clerk-react';
 import { useNavigate } from "react-router-dom";
 import { useSignupMutation } from '@/features/userSliceApi.js';
+import toast from 'react-hot-toast';
 
 export default function VerifyEmail() {
 
@@ -44,11 +45,13 @@ export default function VerifyEmail() {
         token
       }).unwrap();
 
+      toast.success("Successfully saved to database")
       console.log('✅ User saved successfully:', response);
       navigate('/dashboard');
 
     } catch (err) {
-      console.error("❌ Error saving user:",err);
+      console.error("❌ Error saving user:", err);
+      toast.error("Error in saving user")
       setError(
         err.data?.message ||
         err.error ||
@@ -57,35 +60,30 @@ export default function VerifyEmail() {
     }
   };
 
-useEffect(() => {
-  console.log("useEffect triggered!!")
-  const save = async () => {
-    if (user && shouldSave) {
-      await saveUserToDB();
-    }
-  };
-  save();
-}, [user, shouldSave]);
+  useEffect(() => {
+    const save = async () => {
+      if (user && shouldSave) {
+        await saveUserToDB();
+      }
+    };
+    save();
+  }, [user, shouldSave]);
 
   const handleVerify = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    console.log("handel verify triggered")
+
     try {
       const completeSignUp = await signUp.attemptEmailAddressVerification({ code });
-
       await setActive({ session: completeSignUp.createdSessionId });
-
-      console.log("session been cerated...")
-
       console.log('✅ Session created:', completeSignUp.createdSessionId);
-
+      toast.success("Successfully Signed in")
       setShouldSave(true);
-
     } catch (err) {
       console.error('❌ Verification Error:', err);
       setError(err.errors ? err.errors[0].message : 'Invalid code!');
+      toast.error("You entered wrong code")
     } finally {
       setLoading(false);
     }

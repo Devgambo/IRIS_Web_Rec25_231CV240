@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSignIn } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
+import { useSignIn, useUser } from "@clerk/clerk-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,15 @@ import {
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function SignIn() {
+    const { user } = useUser()
+
+    const role = user?.unsafeMetadata?.role;
+
+    // [bug]
+    const navigateTo = role === 'admin' ? '/dashboard-admin' : '/dashboard';
     const { isLoaded, signIn, setActive } = useSignIn();
     const [emailAddress, setEmailAddress] = useState("");
     const [password, setPassword] = useState("");
@@ -40,13 +47,16 @@ export default function SignIn() {
 
             if (result.status === "complete") {
                 await setActive({ session: result.createdSessionId });
-                navigate("/dashboard");
+                toast.success("Successfully logged in")
+                navigate(navigateTo)
             } else {
                 console.error(JSON.stringify(result, null, 2));
+                toast.error("Error in logging in")
             }
         } catch (err) {
             console.error("error", err.errors?.[0]?.message || err.message);
             setError(err.errors?.[0]?.message || err.message);
+            toast.error("Error in loggin in")
         }
     }
 

@@ -6,6 +6,8 @@ import { useAuth } from '@clerk/clerk-react';
 import { useGetCatsQuery } from '@/features/catSliceApi';
 import { useDeleteCatMutation } from '@/features/catSliceApi';
 import { useUpdateCatMutation } from '@/features/catSliceApi';
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 function AllCat() {
     const { getToken } = useAuth();
@@ -26,8 +28,8 @@ function AllCat() {
     const [selectedCat, setSelectedCat] = useState();
     const [modelOpen, setModelOpen] = useState(false);
 
-    const [deleteCat , {isLoading:deleting}] = useDeleteCatMutation();
-    const [updateCat , {isLoading:updating}] = useUpdateCatMutation()
+    const [deleteCat, { isLoading: deleting }] = useDeleteCatMutation();
+    const [updateCat, { isLoading: updating }] = useUpdateCatMutation()
 
     const Ecats = Equipcat?.data?.categories || [];
     const Icats = Infracat?.data?.categories || [];
@@ -42,32 +44,37 @@ function AllCat() {
         console.log('Form submitted:', formdata);
         try {
             const currentToken = await getToken();
-            const response = await updateCat({token:currentToken,id:formdata.id,data:formdata})
-            console.log(response);
+            const response = await updateCat({ token: currentToken, id: formdata.id, data: formdata })
+            console.log("response :", response);
+            toast.success("Category Updated!")
             setModelOpen(false);
         } catch (error) {
+            toast.error("Error in updating category")
             console.error('Error:', error);
         }
     }
 
-    //TODO_toster
     const handleDelete = async (formdata) => {
         try {
             console.log('id:', formdata);
             const currentToken = await getToken();
-            const response = await deleteCat({token:currentToken , id:formdata});
-            console.log(response);
+            const response = await deleteCat({ token: currentToken, id: formdata });
+            console.log("response :", response);
+            toast.success("Category deleted.")
         } catch (err) {
+            toast.error("Error in category deletion.")
             console.log(err);
         }
     }
 
-//TODO_loader
     return (
         <div className='space-y-3 p-4'>
             <div className='w-full text-xl underline'> Equipment Categories: </div>
             {fetchingECat &&
-                <>Loading...</>
+                <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    fetching...
+                </>
             }
             {Ecats.map((cat, index) => (
                 <motion.div
@@ -89,7 +96,10 @@ function AllCat() {
             <div className='w-full text-xl underline'> Infrastructure Categories: </div>
 
             {fetchingICat &&
-                <>Loading...</>
+                <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                fetching...
+            </>
             }
             {Icats.map((cat, index) => (
                 <motion.div
@@ -114,7 +124,7 @@ function AllCat() {
                 data={selectedCat}
                 onSubmit={handleSubmit}
                 onDelete={handleDelete}
-                loading={deleting||updating}
+                loading={deleting || updating}
             />
         </div>
     )

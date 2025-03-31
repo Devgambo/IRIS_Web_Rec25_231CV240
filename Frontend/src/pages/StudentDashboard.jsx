@@ -13,23 +13,24 @@ function StudentDashboard() {
     const [showingEquipListing, setShowingEquipListing] = useState(false)
     const [showingInfraListing, setShowingInfraListing] = useState(false)
     const [cat_id, setCat_id] = useState();
+    const [cat_img, setCat_img] = useState();
 
     const renderComponent = () => {
 
         if (showingEquipListing) {
-            return <EquipmentList cat_id={cat_id} setShowingListing={setShowingEquipListing} />
+            return <EquipmentList cat_id={cat_id} setShowingListing={setShowingEquipListing} cat_img={cat_img} />
         }
         if (showingInfraListing) {
-            return <InfrastructureList cat_id={cat_id} setShowingListing={setShowingInfraListing} />
+            return <InfrastructureList cat_id={cat_id} setShowingListing={setShowingInfraListing} cat_img={cat_img} />
         }
 
         switch (selectedTab) {
             case 'Current Bookings':
                 return <CurrentReq />;
             case 'Equipments':
-                return <EquipmentShow setCat_id={setCat_id} setShowingListing={setShowingEquipListing} />;
+                return <EquipmentShow setCat_id={setCat_id} setShowingListing={setShowingEquipListing} setCat_img={setCat_img} />;
             case 'Infrastructure':
-                return <InfraShow setCat_id={setCat_id} setShowingListing={setShowingInfraListing}/>;
+                return <InfraShow setCat_id={setCat_id} setShowingListing={setShowingInfraListing} setCat_img={setCat_img}/>;
             case 'History':
                 return <History />;
             default:

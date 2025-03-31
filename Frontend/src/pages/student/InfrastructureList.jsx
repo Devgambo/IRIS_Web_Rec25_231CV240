@@ -1,56 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import InfraLisCard from '@/components/student/InfraLisCard';
 import InfraReqForm from '@/components/student/InfraReqForm';
+import { useAuth } from '@clerk/clerk-react';
+import { useGetInfrastructuresQuery } from '@/features/infraSliceApi';
 
-function InfrastructureList({ cat_id, setShowingListing }) {
+function InfrastructureList({ cat_id, setShowingListing , cat_img}) {
+    
     const [showModal, setShowModal] = useState(false);
     const [selectedInfra, setSelectedInfra] = useState(null);
 
-    //TODO:  Hardcoded data based on cat_id (replace with API call later)
-    const infraData = {
-        1324: [ // Example category ID
-            {
-                id: 1,
-                name: "Cricket Ground",
-                location: "Main Campus",
-                capacity: 100,
-                condition: "good",
-                description: "Well-maintained cricket ground with floodlights.",
-                timeSlots: ["10:00 AM - 12:00 PM", "2:00 PM - 4:00 PM"],
-                availability: true,
-            },
-            {
-                id: 2,
-                name: "Tennis Court",
-                location: "Sports Complex",
-                capacity: 4,
-                condition: "good",
-                description: "Professional tennis court with synthetic surface.",
-                timeSlots: ["9:00 AM - 11:00 AM", "3:00 PM - 5:00 PM"],
-                availability: true,
-            },
-        ],
-        1764: [ // Another example category ID
-            {
-                id: 3,
-                name: "Football Field",
-                location: "East Campus",
-                capacity: 22,
-                condition: "maintenance",
-                description: "Grass football field under maintenance.",
-                timeSlots: ["4:00 PM - 6:00 PM"],
-                availability: false,
-            },
-        ],
-    };
+    const { getToken } = useAuth();
+    const [token, setToken] = useState();
+    useEffect(() => {
+        const fetchToken = async () => {
+            const fetchedToken = await getToken();
+            setToken(fetchedToken);
+        };
+        fetchToken();
+    }, [getToken]);
 
-    //temp
-    const infraList = infraData[cat_id] || [];
+    const { data: Infra, isLoading } = useGetInfrastructuresQuery({ token, cat_id })
+
+    const infraList = Infra?.data?.allInfras || [];
 
     const handleInfraClick = (infra) => {
         setSelectedInfra(infra);
         setShowModal(true);
     };
+
+    if (isLoading) {
+        return <div className="m-5 text-center">Loading infrastructure...</div>;
+    }
 
     return (
         <div className='relative grid md:grid-cols-2'>
@@ -68,7 +48,7 @@ function InfrastructureList({ cat_id, setShowingListing }) {
                 </div>
 
                 {infraList.map((infra, index) => (
-                    <button key={infra.id} onClick={() => handleInfraClick(infra)}>
+                    <button key={infra._id} onClick={() => handleInfraClick(infra)}>
                         <InfraLisCard
                             name={infra.name}
                             location={infra.location}
@@ -83,7 +63,7 @@ function InfrastructureList({ cat_id, setShowingListing }) {
             </div>
 
             <div className='p-2 bg-white/5 flex justify-center align-middle items-center'>
-                Image here
+                <img src={cat_img} alt="catImg" />
             </div>
 
             {/* Modal */}

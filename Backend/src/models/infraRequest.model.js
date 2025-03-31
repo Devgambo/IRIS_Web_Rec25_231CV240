@@ -18,7 +18,6 @@ const infraBookingSchema = new mongoose.Schema({
   },
   timeSlot: {
     type: String, required: true,
-    enum: ['5:15am', '6:15am', '7:15am', '5:30pm', '6:30pm', '7:30pm']
   },
   status: {
     type: String, enum: ['pending', 'approved', 'rejected', 'cancelled','completed'],

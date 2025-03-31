@@ -62,7 +62,7 @@ const RequestDetailsForm = ({
     console.log(formData)
     onSubmit({
       ...formData,
-      status: status // 'approved' or 'rejected'
+      status: status
     });
   };
 

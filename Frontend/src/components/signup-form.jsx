@@ -6,10 +6,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSignUp, useUser } from '@clerk/clerk-react';
+import { useSignUp } from '@clerk/clerk-react';
 import VerifyEmail from "./verifyEmail";
 import { Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 
 const signupSchema = z.object({
@@ -58,12 +59,11 @@ export default function SignupForm() {
 
       // Send verification email
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-
-      //TODO: toaster for alerts (code sent!)
-
+      toast.success("Verification code sent!")
       setIsPendingVerification(true)
     } catch (err) {
       console.error(err);
+      toast.error("Error in sending verification code")
       setError(err.errors ? err.errors[0].message : 'Something went wrong!');
     } finally {
       setLoading(false);
@@ -87,24 +87,24 @@ export default function SignupForm() {
       </p>
       <form className="my-8" onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-          <LabelInputContainer>
+          <LabelInputContainer className={'text-black/40'}>
             <Label htmlFor="firstname">First name</Label>
             <Input {...register('firstname')} id="firstname" placeholder="Tyler" type="text" />
           </LabelInputContainer>
-          <LabelInputContainer>
+          <LabelInputContainer className={'text-black/40'}>
             <Label htmlFor="lastname">Last name</Label>
             <Input {...register('lastname')} id="lastname" placeholder="Durden" type="text" />
           </LabelInputContainer>
         </div>
-        <LabelInputContainer className="mb-4">
+        <LabelInputContainer className={'text-black/40 mb-4'}>
           <Label htmlFor="email">Email Address</Label>
           <Input {...register('email')} id="email" placeholder="projectmayhem@fc.com" type="email" />
         </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
+        <LabelInputContainer className={'text-black/40 mb-4'}>
           <Label htmlFor="registrationNo">Registration Number</Label>
           <Input {...register('regNo')} id="registrationNo" placeholder="2310229" type="number" />
         </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
+        <LabelInputContainer className={'text-black/40 mb-4'}>
           <Label htmlFor="password">Create Password</Label>
           <div className="relative">
             <Input {...register('password')} id="password" placeholder="••••••••" type={showPassword ? "text" : "password"} />

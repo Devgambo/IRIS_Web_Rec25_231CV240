@@ -30,6 +30,7 @@ import { useGetCatsQuery } from '@/features/catSliceApi';
 import { useCreateEquipMutation } from '@/features/equipSliceApi';
 import { useAuth } from '@clerk/clerk-react';
 import { Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 
 function CreateEquipForm({ onSuccess }) {
@@ -79,10 +80,12 @@ function CreateEquipForm({ onSuccess }) {
       }).unwrap();
       
       console.log(response);
+      toast.success("Equipment created successfully")
       form.reset();
       onSuccess?.();
     } catch (error) {
       console.error('Error creating equipment:', error);
+      toast.error("Error while creating equipment")
     }
   };
 

@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react'
 import { motion } from "framer-motion";
 import UpdateShowForm from './forms/UpdateShowForm';
 import { useAuth } from '@clerk/clerk-react';
-import { useGetAllEquipmentsQuery, useUpdateEquipmentMutation , useDeleteEquipmentMutation} from '@/features/equipSliceApi';
-
+import { useGetAllEquipmentsQuery, useUpdateEquipmentMutation, useDeleteEquipmentMutation } from '@/features/equipSliceApi';
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 function AllEquips() {
     const { getToken } = useAuth()
@@ -21,8 +22,8 @@ function AllEquips() {
     }, [getToken]);
 
     const { data: AllEquipments, isLoading: fetching } = useGetAllEquipmentsQuery({ token });
-    const [updateEquipment , {isLoading:updating}] = useUpdateEquipmentMutation();
-    const [deleteEquipment , {isLoading:deleting}] = useDeleteEquipmentMutation();
+    const [updateEquipment, { isLoading: updating }] = useUpdateEquipmentMutation();
+    const [deleteEquipment, { isLoading: deleting }] = useDeleteEquipmentMutation();
     const equipments = AllEquipments?.data?.equipments || [];
 
     const handleEquipClick = (equip) => {
@@ -30,15 +31,15 @@ function AllEquips() {
         setModelOpen(true);
     }
 
-    //TODO_toaster
-
     const handleSubmit = async (formdata) => {
         try {
             const currToken = await getToken();
-            const response = await updateEquipment({token:currToken,data:formdata,id:formdata.id})
-            console.log(response);
+            const response = await updateEquipment({ token: currToken, data: formdata, id: formdata.id })
+            console.log("response :", response);
+            toast.success("Equipment updated!")
             setModelOpen(false);
         } catch (error) {
+            toast.error("updation failed!")
             console.error('Error:', error);
         }
     }
@@ -46,17 +47,25 @@ function AllEquips() {
     const handleDelete = async (formdata) => {
         try {
             console.log('id:', formdata);
-            const currToken = await getToken(); 
-            const response = await deleteEquipment({token:currToken , id:formdata});
-            console.log(response);
+            const currToken = await getToken();
+            const response = await deleteEquipment({ token: currToken, id: formdata });
+            console.log("response :", response);
+            toast.success("Equipment deleted!")
             setModelOpen(false);
         } catch (error) {
+            toast.error("deletion failed!")
             console.log(error);
         }
     }
 
     return (
         <div className='space-y-3 p-4'>
+            {fetching &&
+                <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> fetching...
+                </>
+            }
+
             {equipments.map((equip, index) => (
                 <motion.div
                     key={equip._id}
@@ -71,6 +80,7 @@ function AllEquips() {
                         onClick={() => handleEquipClick(equip)}
                     />
 
+
                 </motion.div>
             ))}
 
@@ -80,7 +90,7 @@ function AllEquips() {
                 data={selectedEquip}
                 onSubmit={handleSubmit}
                 onDelete={handleDelete}
-                loading={updating||deleting}
+                loading={updating || deleting}
             />
 
         </div>

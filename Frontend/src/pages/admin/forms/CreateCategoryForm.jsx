@@ -17,6 +17,8 @@ import { Button } from '@/components/ui/button';
 
 import { useAuth } from '@clerk/clerk-react';
 import { useCreateCatMutation } from '@/features/catSliceApi';
+import toast from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
 
 // Schema for form validation
 const categoryFormSchema = z.object({
@@ -64,8 +66,8 @@ function CreateCategoryForm({ onSuccess }) {
       if (selectedFile) {
         formData.append('coverImage', selectedFile);
       }
-      
-      // Debug - let's see what's in the FormData
+
+      //remove this
       for (let pair of formData.entries()) {
         console.log(pair[0] + ': ' + pair[1]);
       }
@@ -78,15 +80,14 @@ function CreateCategoryForm({ onSuccess }) {
       }).unwrap();
 
       console.log(response);
-      //TODO_toaster
+      toast.success("Category created successfully")
       form.reset();
       setSelectedFile(null);
       setPreviewImage(null);
-
-      onSuccess?.(); // Callback for parent component
+      onSuccess?.();
     } catch (err) {
       console.error("❌ Error in creating category", err);
-      
+      toast.error("Error while creating category")
     }
   };
 
@@ -191,8 +192,8 @@ function CreateCategoryForm({ onSuccess }) {
             >
               {isLoading ? (
                 <>
-                  loading...
-                  {/* TODO_loader */}
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  creating...
                 </>
               ) : (
                 'Create Category'

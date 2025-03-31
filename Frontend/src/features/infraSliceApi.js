@@ -14,6 +14,15 @@ export const infraApiSlice = apiSlice.injectEndpoints({
                     }
                 }
             },
+            
+            async onQueryStarted(arg, { queryFulfilled }) {
+                try {
+                    await queryFulfilled;
+                    console.log("Infra created successfully");
+                } catch (err) {
+                    console.error("Error creating equipment:", err);
+                }
+            },
             invalidatesTags:['Infrastructures']
         }),
 

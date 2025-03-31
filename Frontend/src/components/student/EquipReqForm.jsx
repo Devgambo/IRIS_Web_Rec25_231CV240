@@ -4,13 +4,15 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Calendar } from '@/components/ui/calendar';
-import { Input } from '@/components/ui/input'; // ShadCN Input
-import { Button } from '@/components/ui/button'; // ShadCN Button
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import { useAuth } from '@clerk/clerk-react';
+import { useCreateReqMutation } from '@/features/reqEquipSliceApi';
+import toast from 'react-hot-toast';
 
-// ✅ Zod schema for form validation
 const requestSchema = z.object({
-    quantity: z.number({ required_error: 'quantity is required' }),
+    quantity: z.coerce.number().min(1, { message: 'Quantity must be at least 1' }).max(100, { message: 'Quantity cannot exceed 100' }),
     bookingDate: z.date({ required_error: 'Booking date is required' }),
     startTime: z.string().min(1, 'Start time is required'),
     endTime: z.string().min(1, 'End time is required'),
@@ -18,37 +20,55 @@ const requestSchema = z.object({
 
 function ReqForm({ equipment, onClose }) {
 
+    const { getToken } = useAuth();
+    
     const {
         register,
         handleSubmit,
         setValue,
         formState: { errors },
+        watch,
     } = useForm({
         resolver: zodResolver(requestSchema),
+        defaultValues: {
+            quantity: 1
+        }
     });
 
     const [bookingDate, setBookingDate] = useState(null);
 
+    const [createReq, { isLoading }] = useCreateReqMutation();
+
+    const watchedQuantity = watch('quantity');
+    const isQuantityValid = watchedQuantity <= equipment.availableQuantity;
+
     const handleFormSubmit = async (data) => {
-        console.log('Form submitted:', {
-            ...data,
-            bookingDate: format(data.bookingDate, 'yyyy-MM-dd'),
-        });
-
-        // TODO: Send createEquipReq API call here
-        // Example:
-        /*
-        await axios.post('/api/equipment-request', {
-          equipmentId: equipment.id,
-          quantity: 1, // Assuming 1 for now, handle quantity if needed
-          bookingDate: format(data.bookingDate, 'yyyy-MM-dd'),
-          startTime: data.startTime,
-          endTime: data.endTime,
-          note: data.note,
-        });
-        */
-
-        onClose();
+        try {
+            const token = await getToken();
+            if (data.quantity > equipment.availableQuantity) {
+                toast.error(`Cannot request more than available quantity (${equipment.availableQuantity})`);
+                return;
+            }
+            const requestData = {
+                token,
+                data: {
+                    quantity: data.quantity,
+                    bookingDate: format(data.bookingDate, 'yyyy-MM-dd'),
+                    startTime: data.startTime,
+                    endTime: data.endTime
+                },
+                eq_id: equipment._id
+            };
+            
+            const response = await createReq(requestData).unwrap();
+            console.log("response :",response);
+            toast.success("Request Sent!");
+            onClose();
+            
+        } catch (error) {
+            toast.error("Error in sending infra req!")
+            console.error('Error submitting request:', error);
+        }
     };
 
     return (
@@ -92,6 +112,7 @@ function ReqForm({ equipment, onClose }) {
                                         setBookingDate(date);
                                         setValue('bookingDate', date);
                                     }}
+                                    disabled={(date) => date < new Date()}
                                     className="rounded-md border border-zinc-700 bg-zinc-800 text-white"
                                 />
                                 {errors.bookingDate && (
@@ -114,7 +135,7 @@ function ReqForm({ equipment, onClose }) {
                                 </div>
 
                                 {/* End Time */}
-                                <div>
+                                <div className="mt-3">
                                     <label className="block text-sm font-medium text-gray-300 mb-1">End Time</label>
                                     <Input
                                         type="time"
@@ -127,23 +148,37 @@ function ReqForm({ equipment, onClose }) {
                                 </div>
 
                                 {/* quantity */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Quantity</label>
+                                <div className="mt-3">
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Quantity <span className="text-xs text-gray-400">(Available: {equipment.availableQuantity})</span>
+                                    </label>
                                     <Input
-                                        type="Number"
-                                        placeholder=""
-                                        {...register('quantity')}
-                                        className="bg-zinc-800 text-white border-zinc-700 focus-visible:ring-1 focus-visible:ring-blue-500"
+                                        type="number"
+                                        min="1"
+                                        max={equipment.availableQuantity}
+                                        {...register('quantity', { valueAsNumber: true })}
+                                        className={`bg-zinc-800 text-white border-zinc-700 focus-visible:ring-1 focus-visible:ring-blue-500 ${
+                                            !isQuantityValid ? 'border-red-500' : ''
+                                        }`}
                                     />
+                                    {errors.quantity && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.quantity.message}</p>
+                                    )}
+                                    {!isQuantityValid && !errors.quantity && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            Cannot request more than available quantity
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md"
+                            disabled={isLoading || !isQuantityValid}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md disabled:bg-gray-500 disabled:cursor-not-allowed"
                         >
-                            Submit Request
+                            {isLoading ? 'Submitting...' : 'Submit Request'}
                         </Button>
                     </form>
                 </motion.div>

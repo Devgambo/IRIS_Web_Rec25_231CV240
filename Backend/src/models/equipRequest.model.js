@@ -1,16 +1,14 @@
 import mongoose from "mongoose";
-import Equipment from "./equipment.model.js";
-import User from "./user.model.js";
 
 const equipmentRequestSchema = new mongoose.Schema({
    userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: User,
+      ref: 'User',
       required: true
    },
    equipmentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: Equipment,
+      ref: 'Equipment',
       required: true
    },
    quantity: {

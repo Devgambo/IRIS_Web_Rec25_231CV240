@@ -8,28 +8,30 @@ function AdminDashboard() {
 
     const [selectedTab, setSelectedTab] = useState('Current Bookings')
 
-    const tabs = ["Equipments", "Infrastructure" ];
+    const tabs = ["Equipments", "Infrastructure"];
 
     const renderComponent = () => {
-        switch(selectedTab){
+        switch (selectedTab) {
             case 'Equipments':
-                return <AllEquipReqPending/>
+                return <AllEquipReqPending />
             case 'Infrastructure':
-                return <AllInfraReqPending/>
+                return <AllInfraReqPending />
             default:
-                return <AllEquipReqPending/>
+                return <AllEquipReqPending />
         }
     }
 
     return (
-        <div className=' w-full mt-16 h-screen'>
-            {/* <div>
-                <Statistics/>
-            </div> */}
-            <h1 className='m-2 text-2xl font-semibold absolute'>Pending Requests:</h1>
-            <ChipTabs className={'w-[90%] md:w-[25%] m-5 p-5'} selected={selectedTab} setSelected={setSelectedTab} tabs={tabs} />
-            <div className='p-2 mt-18 m-2'>
-                {renderComponent()}
+        <div className='mt-18 grid md:grid-cols-5 grid-cols-1'>
+            <div className='md:col-span-3'>
+                <Statistics />
+            </div>
+            <div className='md:col-span-2'>
+                <h1 className='m-5 text-xl font-bold absolute'>Pending Requests:</h1>
+                <ChipTabs className={'w-full md:w-[60%] m-6 p-5'} selected={selectedTab} setSelected={setSelectedTab} tabs={tabs} />
+                <div className='p-2 mt-18 m-2'>
+                    {renderComponent()}
+                </div>
             </div>
         </div>
     )

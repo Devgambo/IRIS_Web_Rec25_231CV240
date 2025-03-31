@@ -4,6 +4,10 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Calendar } from '@/components/ui/calendar';
+import { useAuth } from '@clerk/clerk-react';
+import { useCreateIReqMutation } from '@/features/reqInfraSliceApi';
+import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 // Zod schema for form validation
 const requestSchema = z.object({
@@ -12,6 +16,12 @@ const requestSchema = z.object({
 });
 
 function InfraReqForm({ infra, onClose }) {
+    const { getToken } = useAuth();
+
+    if(infra.availability == false){
+        return <>Equip is not available</>
+    }
+
     const {
         register,
         handleSubmit,
@@ -22,9 +32,31 @@ function InfraReqForm({ infra, onClose }) {
     });
 
     const [bookingDate, setBookingDate] = useState(null);
+    const [createIReq, {isLoading}] = useCreateIReqMutation();
 
     const handleFormSubmit = async (data) => {
-        //TODO: Send post req to create InfraReq
+        try {
+            const token = await getToken();
+            if(!infra.availability){
+                console.error("not available");
+                return;
+            }
+            const requestData = {
+                token,
+                data: {
+                    bookingDate: format(data.bookingDate, 'yyyy-MM-dd'),
+                    timeSlot: data.timeSlot
+                },
+                inf_id: infra._id
+            };
+            const response = await createIReq(requestData).unwrap();
+            console.log("response :",response);
+            toast.success("Request Sent!")
+            onClose();
+        } catch (error) {
+            toast.error("Error in sending infra req!")
+            console.error('Error submitting request:', error);
+        }
     };
 
     return (
@@ -36,7 +68,7 @@ function InfraReqForm({ infra, onClose }) {
                 exit={{ opacity: 0 }}
             >
                 <motion.div
-                    className="bg-zinc-900 text-white rounded-2xl md:w-[40%] w=full p-6 relative shadow-2xl border border-zinc-800"
+                    className="bg-zinc-900 text-white rounded-2xl md:w-[40%] w-full p-6 relative shadow-2xl border border-zinc-800"
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
                     exit={{ scale: 0.8 }}
@@ -67,6 +99,7 @@ function InfraReqForm({ infra, onClose }) {
                                         setBookingDate(date);
                                         setValue('bookingDate', date);
                                     }}
+                                    disabled={(date) => date < new Date()}
                                     className="rounded-md border border-zinc-700 bg-zinc-800 text-white"
                                 />
                                 {errors.bookingDate && (
@@ -81,7 +114,7 @@ function InfraReqForm({ infra, onClose }) {
                                     className="w-full bg-white/15 rounded px-2 py-1"
                                 >
                                     {infra.timeSlots.map((slot, index) => (
-                                        <option className=' text-black' key={index} value={slot}>
+                                        <option className='text-black' key={index} value={slot}>
                                             {slot}
                                         </option>
                                     ))}
@@ -94,6 +127,7 @@ function InfraReqForm({ infra, onClose }) {
 
                         <button
                             type="submit"
+                            disabled={isLoading}
                             className="w-full my-5 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
                         >
                             Submit Request

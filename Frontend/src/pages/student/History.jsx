@@ -1,35 +1,91 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
+import { useEReqsByStatusQuery } from '@/features/reqEquipSliceApi'
+import { useIReqsByStatusQuery } from '@/features/reqInfraSliceApi';
+import ListingCard from '@/components/student/ListingReqCard';
+import toast from 'react-hot-toast';
+import { useDeleteRequestMutation } from '@/features/reqEquipSliceApi';
+import { useDeleteIRequestMutation } from '@/features/reqInfraSliceApi';
 
 function History() {
 
-    const [history, setHistory] = useState([
-        {
-            id: 1,
-            equipName: 'Cricket Bat',
-            status: 'completed',
-            requestDate: '2025-03-01',
-            returnDate: '2025-03-05',
-            adminComment: '',
-        },
-        {
-            id: 2,
-            equipName: 'Football',
-            status: 'rejected',
-            requestDate: '2025-03-10',
-            approvedDate: '2025-03-11',
-            adminComment: 'Not available during the requested slot',
-        },
-        {
-            id: 3,
-            equipName: 'Badminton Racket',
-            status: 'completed',
-            requestDate: '2025-02-15',
-            returnDate: '2025-02-16',
-            adminComment: '',
-        },
-    ]);
+    const { getToken } = useAuth();
+    const [deleteRequest] = useDeleteRequestMutation()
+    const [deleteIRequest] = useDeleteIRequestMutation()
+    const [token, setToken] = useState();
+    useEffect(() => {
+        const fetchToken = async () => {
+            const fetchedToken = await getToken();
+            setToken(fetchedToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    const Cstatus = 'completed';
+    const Rstatus = 'rejected';
+    const clstatus = 'cancelled';
+
+    const {data: ECReqs, isLoading:fetchingECR} = useEReqsByStatusQuery({token, status: Cstatus});
+    const {data: ERReqs, isLoading:fetchingERR} = useEReqsByStatusQuery({token, status: Rstatus});
+    const {data: ECLReqs, isLoading:fetchingECLR} = useEReqsByStatusQuery({token, status: clstatus});
+    const {data: ICReqs, isLoading:fetchingICR} = useIReqsByStatusQuery({token, status: Cstatus});
+    const {data: IRReqs, isLoading:fetchingIRR} = useIReqsByStatusQuery({token, status: Rstatus});
+    const {data: ICLReqs, isLoading:fetchingICLR} = useIReqsByStatusQuery({token, status: clstatus});
+
+    const handleRemove = async (id, type) => {
+        try {
+            if (!token) {
+                toast.error('Authentication token not available');
+                return;
+            }
+            const toastId = toast.loading('Deleting request...');
+            
+            if (type === 'equipment') {
+                await deleteRequest({ token, id }).unwrap();
+            } else if (type === 'infrastructure') {
+                await deleteIRequest({ token, id }).unwrap();
+            }
+
+            toast.success('Request deleted successfully', { id: toastId });
+            
+        } catch (error) {
+            console.error('Error deleting request:', error);
+            toast.error('Failed to delete request');
+        }
+    };
+
+    const history = [
+        ...(ECReqs?.data?.reqs || []).map(req => ({
+            ...req,
+            type: 'equipment',
+            name: req.equipmentId?.name || 'Unknown Equipment'
+        })),
+        ...(ERReqs?.data?.reqs || []).map(req => ({
+            ...req,
+            type: 'equipment',
+            name: req.equipmentId?.name || 'Unknown Equipment'
+        })),
+        ...(ICReqs?.data?.reqs || []).map(req => ({
+            ...req,
+            type: 'infrastructure',
+            name: req.infrastructureId?.name || 'Unknown Infrastructure'
+        })),
+        ...(IRReqs?.data?.reqs || []).map(req => ({
+            ...req,
+            type: 'infrastructure',
+            name: req.infrastructureId?.name || 'Unknown Infrastructure'
+        })),
+        ...(ICLReqs?.data?.reqs || []).map(req => ({
+            ...req,
+            type: 'infrastructure',
+            name: req.infrastructureId?.name || 'Unknown Infrastructure'
+        })),
+        ...(ECLReqs?.data?.reqs || []).map(req => ({
+            ...req,
+            type: 'equipment',
+            name: req.infrastructureId?.name || 'Unknown Infrastructure'
+        })),
+    ];
 
     return (
         <div className="p-4">
@@ -38,76 +94,18 @@ function History() {
                 {history.length === 0 ? (
                     <div className="text-center text-gray-500">No history found.</div>
                 ) : (
-                    history.map((item) => (
-                        <HistoryCard key={item.id} {...item} />
+                    history.map((req,index) => (
+                        <ListingCard
+                            key={req._id}
+                            index={index + 1}
+                            {...req}
+                            type={req.type}
+                            onRemove={(id)=>handleRemove(id, req.type)}
+                        />
                     ))
                 )}
             </div>
         </div>
-    );
-}
-
-
-
-
-function HistoryCard({
-    id,
-    equipName,
-    status,
-    requestDate,
-    returnDate,
-    approvedDate,
-    adminComment,
-    quantity
-}) {
-    const bgStatus = status === 'completed'
-        ? 'from-green-500 to-lime-400'
-        : 'from-red-500 to-pink-400';
-
-    // Animation variants for the card
-    const cardVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-    };
-
-    return (
-        <motion.div
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-            className={`w-full p-4 rounded-lg bg-gradient-to-r ${bgStatus} shadow-md mb-4`}
-        >
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-black">
-                {/* ID */}
-                <div className="col-span-1 font-bold flex md:justify-center">#{id}</div>
-
-                {/* Equipment Name */}
-                <div className="col-span-3 md:col-span-4 flex md:justify-center">
-                    <span className="font-medium">{equipName}</span>
-                </div>
-
-                {/* Status */}
-                <div className="col-span-3 flex md:justify-center capitalize">
-                    <span className="font-semibold">{status}</span>
-                </div>
-
-                {/* Details */}
-                <div className="col-span-5 md:col-span-4 text-sm">
-                    <p><span className="font-semibold">Requested On:</span> {requestDate}</p>
-
-                    {status === 'completed' && (
-                        <p><span className="font-semibold">Response On:</span> {returnDate}</p>
-                    )}
-
-                    {status === 'rejected' && (
-                        <>
-                            <p><span className="font-semibold">Rejected On:</span> {approvedDate}</p>
-                            <p><span className="font-semibold">Admin Comment:</span> {adminComment}</p>
-                        </>
-                    )}
-                </div>
-            </div>
-        </motion.div>
     );
 }
 

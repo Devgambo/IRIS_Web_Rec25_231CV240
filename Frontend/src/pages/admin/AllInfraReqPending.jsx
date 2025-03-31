@@ -1,68 +1,61 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import ReqCard from "@/components/admin/reqCard";
 import RequestDetailsForm from "./forms/ReqDetailsForm";
-// import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@clerk/clerk-react";
+import { useGetIRequestsQuery, useUpdateIRequestMutation } from "@/features/reqInfraSliceApi";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 function AllInfraReqPending() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);  //use this which fetching the data()
-//   const { toast } = useToast();
+ 
+  const { getToken } = useAuth();
 
-  // Mock data - replace with your actual data fetching logic
-  const infraReqs = [
-    {
-      _id: "1",
-      userId: { name: "Jane Smith" },
-      infraId: { name: "Football Ground" },
-      bookingDate: "2023-12-24T00:00:00.000Z",
-      timeSlot: "5:30pm",
-      status: "pending",
-    },
-    {
-      _id: "2", 
-      userId: { name: "Alex Johnson" },
-      infraId: { name: "Basketball Court" },
-      bookingDate: "2023-12-25T00:00:00.000Z",
-      timeSlot: "6:30pm",
-      status: "pending",
-    },
-    {
-      _id: "3",
-      userId: { name: "Sam Wilson" },
-      infraId: { name: "Tennis Court" },
-      bookingDate: "2023-12-26T00:00:00.000Z",
-      timeSlot: "7:30pm",
-      status: "pending",
-    }
-  ];
+  const [token, setToken] = useState();
+  useEffect(() => {
+    const fetchToken = async () => {
+      const fetchedToken = await getToken();
+      setToken(fetchedToken);
+    };
+    fetchToken();
+  }, [getToken]);
 
+  const { data: Reqs, isLoading: fetching } = useGetIRequestsQuery({ token });
+  const [updateRequest, { isLoading: updating }] = useUpdateIRequestMutation();
+
+  const infraReqs = Reqs?.data?.allreqs || [];
+  
   const handleReqClick = (req) => {
     setSelectedRequest(req);
     setModalOpen(true);
   };
 
-  //TODO: api to update the status
   const handleSubmit = async (formData) => {
     console.log('Form submitted:', formData);
     try {
-      setLoading(true);
-      // Your API call would look like:
-      // const response = await axios.put(
-      //   `/api/infra-requests/${selectedRequest._id}`,
-      //   formData
-      // );
+      const currentToken = await getToken();
+      const response = await updateRequest({ token: currentToken, data: formData, id: selectedRequest._id }).unwrap();
+      console.log("response:", response);
+      toast.success("Request approved!")
       setModalOpen(false);
     } catch (error) {
+      toast.error("could not send request")
       console.error('Error:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <div className="space-y-3 p-4">
+
+      {fetching && (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          fetching...
+        </>
+      )}
+
       {infraReqs.map((req, index) => (
         <motion.div
           key={req._id}
@@ -71,7 +64,7 @@ function AllInfraReqPending() {
           transition={{ duration: 0.3, delay: index * 0.05 }}
         >
           <ReqCard
-            name={req.infraId.name}
+            name={req?.infrastructureId?.name}
             bookingDate={new Date(req.bookingDate).toLocaleDateString()}
             index={index + 1}
             onClick={() => handleReqClick(req)}
@@ -84,7 +77,7 @@ function AllInfraReqPending() {
         onOpenChange={setModalOpen}
         requestData={selectedRequest}
         onSubmit={handleSubmit}
-        loading={loading}
+        loading={updating}
       />
     </div>
   );

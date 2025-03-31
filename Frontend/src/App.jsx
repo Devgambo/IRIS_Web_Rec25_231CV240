@@ -7,30 +7,34 @@ import Protected from './components/Protected'
 import SignInPage from './pages/SignInPage'
 import AdminDashboard from './pages/AdminDashboard'
 import Management from './pages/Management'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   return (
-    <Routes>
-      <Route path='/' element={<Layout />}>
-      
-        {/* public pages */}
-        <Route index element={<HeroPage />} />
-        <Route path='signup' element={<SignUpPage />} />
-        <Route path='signin' element={<SignInPage />} />
+    <div>
+      <Routes>
+        <Route path='/' element={<Layout />}>
 
-        {/* protected pages */}
-        <Route element={<Protected page_for_role={'student'} />}>
-          <Route path='dashboard' element={<StudentDashboard />} />
-        </Route>
-        <Route element={<Protected page_for_role={'admin'} />}>
-          <Route path='dashboard-admin' element={<AdminDashboard />} />
-        </Route>
-        <Route element={<Protected page_for_role={'admin'} />}>
-          <Route path='management' element={<Management />} />
-        </Route>
+          {/* public pages */}
+          <Route index element={<HeroPage />} />
+          <Route path='signup' element={<SignUpPage />} />
+          <Route path='signin' element={<SignInPage />} />
 
-      </Route>
-    </Routes>
+          {/* protected pages */}
+          <Route element={<Protected page_for_role={'student'} />}>
+            <Route path='dashboard' element={<StudentDashboard />} />
+          </Route>
+          <Route element={<Protected page_for_role={'admin'} />}>
+            <Route path='dashboard-admin' element={<AdminDashboard />} />
+          </Route>
+          <Route element={<Protected page_for_role={'admin'} />}>
+            <Route path='management' element={<Management />} />
+          </Route>
+
+        </Route>
+      </Routes>
+      <Toaster position="top-right"  reverseOrder={false}/>
+    </div>
   )
 }
 

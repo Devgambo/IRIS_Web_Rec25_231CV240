@@ -10,7 +10,6 @@ function Protected({page_for_role}) {
 
     const role = user?.unsafeMetadata?.role;
 
-    console.log(user);
     if (!user) {
         return (
             <div className="h-screen flex flex-col justify-center items-center text-2xl">
