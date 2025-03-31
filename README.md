@@ -71,8 +71,12 @@ npm install
 ```
 PORT=5000
 MONGO_URI=<Your_MongoDB_URI>
+CORS_ORIGIN=<localhost where forntend is running>
 CLERK_SECRET_KEY=<Your_Clerk_Secret_Key>
 RESEND_API_KEY=<Your_Resend_API_Key>
+CLOUDINARY_CLOUD_NAME=<name>
+CLOUDINARY_API_KEY=<api key>
+CLOUDINARY_API_SECRET=<api secret>
 ```
 5. Start the server
 ```
@@ -88,7 +92,11 @@ cd ../Frontend
 ```
 npm install
 ```
-3. Start the React development server
+3.create a `.env` file
+```
+VITE_CLERK_PUBLISHABLE_KEY=<clerk_api_key>
+```
+4. Start the React development server
 ```
 npm run dev
 ```
@@ -109,8 +117,16 @@ npm run dev
 ## Schema relation diagram:
 ![Screenshot 2025-03-31 183029](https://github.com/user-attachments/assets/a00b4ed2-b5fd-40ff-9ce3-101f7c40fa78)
 
-
 ## Vedio of me explaining all the features:)
 ### [Watch this video on YouTube](https://youtu.be/i9yWtDvJu_0)
+
+## Screenshots:)
+![Screenshot 2025-03-31 221826](https://github.com/user-attachments/assets/e7ccffec-e2a8-4232-8c61-559de034af35)
+![Screenshot 2025-03-31 222006](https://github.com/user-attachments/assets/9a5865fd-511a-4e04-91d0-2341aa237914)
+
+## BUGS
+- I haven't deployed the project , so the reminder is not working as RESEND needs domane name and can't work in localhost.
+- 
+
 
 
