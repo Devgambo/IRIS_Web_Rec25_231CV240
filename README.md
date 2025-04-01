@@ -46,7 +46,6 @@ NITK_SportsMate/
 │   │   ├── features/
 │   │   ├── lib/
 │   │   ├── pages/
-│   │   ├── utils/
 │   │   ├── App.jsx
 │   │   ├── index.js
 │   │   ├── index.css
@@ -133,8 +132,29 @@ npm run dev
 ![Screenshot 2025-03-31 222006](https://github.com/user-attachments/assets/9a5865fd-511a-4e04-91d0-2341aa237914)
 
 ## BUGS
-- I haven't deployed the project , so the reminder is not working as RESEND needs domane name and can't work in localhost.
-- 
+- Reminder is not working as I have used render for deployment, it's domane name is not valid on RESEND(the 
+service I am using for sending mails)
 
 
+## Role-Based Authentication Flow
+### Overview
+- This project uses Clerk for authentication with a custom signup form. Instead of Clerk's prebuilt components, a tailored registration flow is implemented to capture additional user details.
+
+### Signup Process
+- **1. User Registration:**
+- Users sign up using a custom form.
+- Registration details, including a registration number, are stored in Clerk's unsafeMetadata.
+- The user role is set to student by default.
+
+- **2. Email Verification:**
+- A verification code is sent to the user's email.
+- Upon successful verification, Clerk assigns a unique ClerkId.
+
+- **3. Database Storage:**
+- Once the email is verified, user details, along with the ClerkId, are saved in the database.
+
+- **Admin Registration**
+- Special registration numbers are designated for admin accounts.
+- Users registering with these numbers are given student roles initially.
+- Admin roles are manually updated in the Clerk dashboard by searching for their registration number and modifying the metadata.
 
